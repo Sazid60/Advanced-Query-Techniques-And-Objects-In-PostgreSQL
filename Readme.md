@@ -92,3 +92,65 @@ SELECT * FROM employees WHERE salary > (SELECT  max(salary) from employees where
 | `JOIN`   | ✅ Yes            | `SELECT e.name, d.name FROM employees e JOIN (SELECT * FROM departments WHERE location = 'NY') d ON e.dept_id = d.id` | Less common but useful when joining with filtered sub-tables   |
 
 - When we will use `subqueries` in `SELECT` we have to take care of that it should must return a single value.
+
+## 10-3 Utilizing Subqueries in Different Clauses
+
+### Using `Subqueries` with `SELECT`
+
+- When we will use `subqueries` in `SELECT` we have to take care of that it should must return a single value.
+- suppose we want to see the employees table and we want to see the sum of the employee salaries beside each of the employee
+
+```sql
+SELECT *, (SELECT sum(salary) FROM employees) FROM employees;
+```
+
+- Here `(SELECT sum(salary) FROM employees)` sub query returns a singe value
+- `(SELECT salary FROM employees)` If we write this we will get a error since its not returning single value.
+
+### Using `Subqueries` with `FROM`
+
+- Suppose we have to show department name and beside the name we have to show the sum of the salary of each department's employees.
+
+```sql
+SELECT department_name, sum(salary) FROM employees
+GROUP BY department_name;
+```
+
+- lets do it using sub queries
+
+```sql
+SELECT * FROM(SELECT department_name, sum(salary) FROM employees GROUP BY department_name) as sum_dept_salary;
+
+SELECT department_name FROM(SELECT department_name, sum(salary) FROM employees GROUP BY department_name) as sum_dept_salary;
+```
+
+- here `(SELECT department_name, sum(salary) FROM employees GROUP BY department_name)` is returning a table so that we can see all the data.
+- we can take care of what we are doing inside the sub query.we have to take care of the things like sub queries result should be compatible with the main query.
+
+### Using `Subqueries` with `WHERE`
+
+- Here the sub queries should return a single data or table or multiple data that depends on the thing we want to compare.
+
+- this where condition is working based on singe value
+
+```SQL
+SELECT * FROM employees WHERE salary > (SELECT  max(salary) from employees where department_name = 'HR')
+```
+
+- lets consider a scenario like by using a subquery we will get the `R` Named Departments among the employees and then we will show their data
+- now lets see sub queries with multiple values. using `IN` Means it can return multiple row.
+- basically it depends on the comparison operator.
+
+```sql
+SELECT employee_name, salary, department_name FROM employees
+WHERE department_name IN (SELECT department_name from employees where department_name LIKE '%R%')
+```
+
+- But in here if it return multiple column it will not work. since inside `IN` we have to send a single column data.
+
+```sql
+SELECT employee_name, salary, department_name FROM employees
+WHERE department_name,salary IN (SELECT department_name from employees where department_name LIKE '%R%')
+```
+
+![alt text](image.png)

@@ -59,3 +59,28 @@ SELECT * FROM employees WHERE salary > 63000;
 
 
 SELECT * FROM employees WHERE salary > (SELECT  max(salary) from employees where department_name = 'HR')
+
+
+
+-- suppose we want to see the employees table and we want to see the sum of the employee salaries beside each of the employee
+
+SELECT *, (SELECT sum(salary) FROM employees) FROM employees;
+
+SELECT department_name, sum(salary) FROM employees
+GROUP BY department_name;
+-- lets do it using sub queries
+
+SELECT * FROM(SELECT department_name, sum(salary) FROM employees GROUP BY department_name) as sum_dept_salary;
+
+SELECT department_name FROM(SELECT department_name, sum(salary) FROM employees GROUP BY department_name) as sum_dept_salary;
+
+SELECT * FROM employees WHERE salary > (SELECT  max(salary) from employees where department_name = 'HR')
+
+
+SELECT employee_name, salary, department_name FROM employees
+WHERE department_name IN (SELECT department_name from employees where department_name LIKE '%R%')
+
+
+-- this will show error
+SELECT employee_name, salary, department_name FROM employees
+WHERE department_name, salary IN (SELECT department_name from employees where department_name LIKE '%R%')
