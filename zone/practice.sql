@@ -1,10 +1,3 @@
-# Advanced-Query-Techniques-And-Objects-In-PostgreSQL
-
-GitHub Link: https://github.com/Apollo-Level2-Web-Dev/dbms-postgres
-
-## 10-1 Query Practice: Part 3
-
-```sql
 CREATE TABLE orders(
     order_id SERIAL PRIMARY KEY,
     customer_id INT,
@@ -41,5 +34,3 @@ HAVING count(order_id) >1;
 SELECT extract(month FROM order_date) as order_months, count(order_date) FROM orders
 WHERE EXTRACT(YEAR FROM order_date) = 2024
 GROUP BY order_months;
-
-```
