@@ -48,5 +48,9 @@ SELECT * from employees WHERE last_name = 'Moore';
 
 CREATE INDEX idx_employees_last_name
 ON employees (last_name);
+CREATE INDEX idx_employees_last_name
+ON employees USING HASH (last_name);
 
 SHOW data_directory
+
+SELECT * from employees WHERE employee_no = 1;

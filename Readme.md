@@ -554,3 +554,65 @@ SHOW data_directory
 ![alt text](image-5.png)
 
 - here data is stored inside the files using binary format
+
+## 10-9 Understanding How Indexing Works in PostgreSQL.
+
+- stored data inside the files using binary format is called heap file
+
+![alt text](image-6.png)
+
+- It data can not be stored in single block inside heap file. It is spitted into different blocks.
+- when we do any query database engine can not directly take the file from the hard drive and can not perform any action.
+
+![alt text](<WhatsApp Image 2025-05-22 at 00.04.23_95c4ecee.jpg>)
+
+- Rather database engine tries to take the data from the hard drive to the memory.
+- The Transfer of data from hard disk to memory is costly. This consumes time. Our target is to reduce.
+- When we do not do any indexing each and every block come from hard disk heap file to memory one by one.
+
+![alt text](<WhatsApp Image 2025-05-22 at 00.07.58_b51b87de.jpg>)
+
+- so while doing query over non-indexed table it will scan the full table to do indexing. We have to optimize this.
+- While using the `Where` type clause we have to take care that we are not doing full table scan.
+- Here comes the help of `Indexing`
+
+![alt text](<WhatsApp Image 2025-05-22 at 00.10.57_f5b4ff72.jpg>)
+
+- When indexing is done index named file/table/object is created where her holds the information that which name is in which block's which index.
+- If we want to do the query to find name `sagor`, it will see that in index object that sagor is in block 2.
+
+![alt text](<WhatsApp Image 2025-05-22 at 00.13.04_feb2decb.jpg>)
+
+- So It will go to the heap file 2nd block and transfer only the second block in the memory.
+
+![alt text](<WhatsApp Image 2025-05-22 at 00.13.17_bdc166ab.jpg>)
+
+- this is how we are getting data faster since full table is not coming.
+
+### Now Come to the part that when we will do the indexing?
+
+- We have to take care while creating indexing, since indexing info is kept in database and taking some space.
+- Suppose we have a field that gets updated frequently, in this case doing indexing is tricky, whenever the data gets updated the indexing will get the change as well. whe have to avoid the fields that updates frequently. when the indexing is done in such field if data is updated/deleted we have to bring changes to indexing as well and which is costing time.
+- We will do indexing the fields those are coming frequently in `WHERE` ,`JOIN` ,
+- Whe have to use indexing in `FOREIGN KEY`
+- Inside `PRIMARY KEY`, `UNIQUE KEY` postgres implicitly applies indexing automatically
+
+```sql
+SELECT * from employees WHERE employee_no = 1;
+```
+
+### Indexing has some algorithms
+
+-
+
+1. `B-TREE` : when we do indexing it create b-tree indexing by default
+2. HASH
+   ```SQL
+   CREATE INDEX idx_employees_last_name
+   ON employees USING HASH (last_name);
+   ```
+3. GIN
+4. GIST
+
+- In different use case different algorithm works fine.
+- Basically we use B-TREE
