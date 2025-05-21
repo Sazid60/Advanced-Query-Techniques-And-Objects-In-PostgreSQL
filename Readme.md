@@ -378,3 +378,93 @@ SELECT * FROM employees
 
 - The use cases are like suppose we have a lot of large table. suppose a order is created now we want to update in total sale and who has ordered we want to give him points. we will write all the works in procedures step by step it will work and the data integrity will be maintained.
 - If we want we can use if else condition inside procedure.
+
+## 10-7 Practical Implementation of Triggers in PostgreSQL
+
+- A trigger is a database object in PostgreSQL (and other database management systems) that automatically executes a specified set of actions in response to certain database events or conditions.
+- Its kind of react on Click Event since on click event fires when the event is clicked.
+- We can create trigger here which is like event and which will run after happening a event or before happening the event.
+- Trigger might have some steps which will also run automatically.
+
+### What Could be the event types ?
+
+1. `Table-Level Events:`
+   - INSERT, UPDATE, DELETE, TRUNCATE
+2. `Database-Level Events:`
+   - Database Startup, Database Shutdown, Connection start and end etc
+
+### When is Trigger is Used?
+
+- Suppose we have a user table and now we want to delete a user and then we want to store the deleted users information in another table. we will use trigger here to do it automatically.
+
+#### Now Lets Create a `Trigger`
+
+```sql
+-- CREATE TRIGGER trigger_name
+-- {BEFORE | AFTER | INSTEAD OF} {INSERT | UPDATE | DELETE | TRUNCATE}
+-- ON table_name
+-- [FOR EACH ROW]
+-- EXECUTE FUNCTION function_name();
+-- CREATE trigger TR
+-- BEFORE delete
+-- on user
+-- for EACH row
+-- EXECUTE function_name();
+```
+
+```sql
+CREATE Table my_users
+(
+    user_name VARCHAR(50),
+    email VARCHAR(100)
+);
+
+INSERT INTO my_users VALUES('Mezba', 'mezba@mail.com'), ('Mir', 'mir@mail.com');
+
+SELECT * from my_users;
+
+SELECT * from deleted_users_audit;
+
+CREATE  Table deleted_users_audit
+(
+    deleted_user_name VARCHAR(50),
+    deletedAt TIMESTAMP
+)
+
+
+
+DROP TABLE deleted_users_audit
+
+DROP TABLE my_users
+
+-- lets create a trigger
+
+CREATE OR replace function save_deleted_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+
+INSERT INTO deleted_users_audit values(OLD.user_name, now());
+-- we are using OLD here since we are getting before delete here and the data became old.
+-- here OLD.user_name means what will delete whose row's user name will get here using this.
+RAISE NOTICE'Deleted User Log Created!';
+RETURN OLD;
+
+END
+$$
+
+CREATE OR replace Trigger save_deleted_user_trigger
+BEFORE DELETE
+on my_users
+FOR EACH ROW
+EXECUTE function save_deleted_user();
+-- if we use mysql we can  create a function statement directly but in postgres we can not, in postgres we have to give  a function reference her which makes it more readable.
+
+DELETE from my_users WHERE user_name = 'Mir';
+```
+
+- we can do it rather doing it using sql, we can do it programmatically using drivers using prisma.
+- In Prisma We Will use js to tell the logics. this makes simpler
+- we will do it in backend but in terminal using raw postgres or sql it becomes complex.
