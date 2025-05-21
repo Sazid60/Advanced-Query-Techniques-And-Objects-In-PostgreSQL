@@ -154,3 +154,63 @@ WHERE department_name,salary IN (SELECT department_name from employees where dep
 ```
 
 ![alt text](image.png)
+
+## 10-4 Exploring Views in PostgreSQL
+
+- its like js function which allows us not to write repetitive code. we call function name and do our works.
+- `View` Is Same Kind Of Thing. we can write a complex query and store in variable like thing and use it later by calling by name.
+- `View` are virtual tables generated from the result of a sql query.
+- Basically it stores the reference of the sql query.
+- When we do the view a virtual table is created.
+- As we use the table we can use the view as the same way.
+
+#### Why It name is view?
+
+- Its something like from the window we see some view of the world.
+- Same as using view we see the required data from the world of database.
+- By viewing the required data we store the viewed data in `View` so this is the reason it is called view.
+
+#### What is the purpose of the view
+
+1. `Simplifying complex queries.` The purpose we can think of it like for complexing query we are storing in variable like place and then using it everywhere we need.
+
+```sql
+CREATE VIEW dept_avg_salary -- view name
+AS --as clause
+SELECT department_name, avg(salary) FROM employees GROUP BY department_name; --query whose reference will be stored in view.
+```
+
+- We do not have to `SELECT department_name, avg(salary) FROM employees GROUP BY department_name;` create this again and again we will call `dept_avg_salary` whenever is needed. view is not storing any value its just keeping the reference and when the view is called the view is doing the work and giving the result.
+- For Complex Queries we can make the views.
+
+```sql
+SELECT * FROM dept_avg_salary;
+```
+
+- Another example
+
+```sql
+CREATE VIEW test_view AS
+SELECT employee_name, salary, department_name
+FROM employees
+WHERE department_name IN (
+    SELECT department_name
+    FROM employees
+    WHERE department_name LIKE '%R%'
+);
+
+SELECT * FROM test_view;
+```
+
+1. `Improving Security` : Suppose we have a situation like we have to give a random user a certain access by using which he can see certain result and we want make sure that he is not getting any internal data. we do not want to let any info like table name table column to outer world.
+
+- this is bad practice we just have to give access of the data not any other information. for this we can create a view and give so that what is going on under the hood.
+
+2. `Enhanced data abstraction`
+
+### There are two types of view
+
+1. `Materialized view` : Here query result inside the view is physically stored and when called the result is given instant. Performance is increased here.
+2. non materialized view (we have seen so far).
+
+## 10-5 Exploring Functions in PostgreSQL
