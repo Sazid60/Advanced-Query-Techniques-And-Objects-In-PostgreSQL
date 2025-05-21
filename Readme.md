@@ -295,4 +295,86 @@ $$
 SELECT delete_emp_by_id(29);
 ```
 
+## 10-6 Exploring Stored Procedure in PostgreSQL
+
+- Before postgres version 11 we wew not able to write procedures in postgres. we were just able to write functions inside postgres.
+
+#### The main difference between function and Procedures are
+
+- Procedure can do a work but can not return anything.
+- Function can return if we want.
+- Before version 11 of postgres we were used to write a function and tell that Return is void. this was called procedures
+- But now in updated version we can write procedures.
+
 #### `Procedural` Function
+
+- suppose we have to remove a employee. and now do it using procedure.
+- using the plpgsql we can open new transaction.
+- Allows for complex logic using control structures like loops, conditionals, and exception handling.
+
+```sql
+CREATE PROCEDURE remove_emp()
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+-- here we can write multiple sql queries or one single queries
+-- here will exist the works/action that we want to do using procedure.
+DELETE FROM employees WHERE employee_id = 28;
+END
+$$
+
+CALL remove_emp()
+```
+
+- Inside the procedure we can take parameter and use variables as well.
+- lets assume that if we have any id value 28 then we will proceed.
+
+```sql
+CREATE PROCEDURE remove_emp_var()
+LANGUAGE plpgsql
+AS
+$$
+DECLARE
+test_var INT;
+BEGIN
+SELECT employee_id INTO test_var FROM employees WHERE employee_id = 26;
+DELETE FROM employees WHERE employee_id = test_var;
+END
+$$
+
+CALL remove_emp_var()
+
+SELECT * FROM employees
+```
+
+- If we want we can pass parameters inside procedures.
+
+```sql
+CREATE PROCEDURE remove_emp_by_p(p_employee_id int)
+LANGUAGE plpgsql
+AS
+$$
+
+DECLARE
+test_var INT;
+-- variable declared.
+
+BEGIN
+SELECT employee_id INTO test_var FROM employees WHERE employee_id = p_employee_id;
+ -- we are setting the id to the variable test_var and then we are doing the operation
+DELETE FROM employees WHERE employee_id = test_var;
+
+RAISE NOTICE 'Employee Removed Successfully';
+-- this will give a notice if deleted.
+END
+
+$$;
+
+CALL remove_emp_by_p(27)
+
+SELECT * FROM employees
+```
+
+- The use cases are like suppose we have a lot of large table. suppose a order is created now we want to update in total sale and who has ordered we want to give him points. we will write all the works in procedures step by step it will work and the data integrity will be maintained.
+- If we want we can use if else condition inside procedure.
