@@ -48,3 +48,58 @@ DELETE FROM employees WHERE employee_id = p_emp_id;
 $$
 
 SELECT delete_emp_by_id(29);
+
+CREATE PROCEDURE remove_emp()
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+-- here we can write multiple sql queries or one single queries
+-- here will exist the works/action that we want to do using procedure.
+DELETE FROM employees WHERE employee_id = 28;
+END
+$$
+
+CALL remove_emp()
+
+CREATE PROCEDURE remove_emp_var()
+LANGUAGE plpgsql
+AS
+$$
+DECLARE
+test_var INT;
+BEGIN
+SELECT employee_id INTO test_var FROM employees WHERE employee_id = 26;
+DELETE FROM employees WHERE employee_id = test_var;
+END
+$$
+
+CALL remove_emp_var()
+
+SELECT * FROM employees
+
+
+
+CREATE PROCEDURE remove_emp_by_p(p_employee_id int)
+LANGUAGE plpgsql
+AS
+$$
+
+DECLARE
+test_var INT;
+-- variable declared. 
+
+BEGIN
+SELECT employee_id INTO test_var FROM employees WHERE employee_id = p_employee_id;
+ -- we are setting the id to the variable test_var and then we are doing the operation
+DELETE FROM employees WHERE employee_id = test_var;
+
+RAISE NOTICE 'Employee Removed Successfully';
+-- this will give a notice if deleted. 
+END
+
+$$;
+
+CALL remove_emp_by_p(24)
+
+SELECT * FROM employees
