@@ -625,75 +625,300 @@ SELECT * from employees WHERE employee_no = 1;
 - In different use case different algorithm works fine.
 - Basically we use B-TREE
 
-# SQL Practice Tasks - Module 9
+# SQL Practice Tasks - Module 10
 
-This repository contains SQL queries for various tasks related to **Date & Grouping**, **Foreign Key & Constraints**, and **Join Operations**. The tasks are based on the **students**, **departments**, and **courses** tables, which are used to demonstrate SQL concepts.
-
-## Table Structures
-
-### 1. **students Table**
-
-| Column Name   | Description                             |
-| ------------- | --------------------------------------- |
-| id            | Auto-incremented primary key            |
-| name          | Name of the student                     |
-| department_id | Foreign key referencing departments(id) |
-| last_login    | Last login date                         |
-
-### 2. **departments Table**
-
-| Column Name | Description                      |
-| ----------- | -------------------------------- |
-| id          | Auto-incremented primary key     |
-| name        | Department name (e.g., CSE, EEE) |
-
-### 3. **courses Table**
-
-| Column Name | Description                  |
-| ----------- | ---------------------------- |
-| id          | Auto-incremented primary key |
-| title       | Course title                 |
+This repository contains practice SQL tasks for mastering advanced SQL topics including **subqueries**, **views**, **functions**, **stored procedures**, **triggers**, and **indexing** in **PostgreSQL**.
 
 ---
 
-## Task Overview
+## 📘 Demo Table Overview
 
-### **Date & Grouping Tasks (Based on 9-1, 9-2)**
+The following tasks are based on these sample tables. Use them as references while solving the exercises.
 
-1. **Retrieve students who have logged in within the last 30 days.**
+### 🔹 `students` Table
 
-2. **Extract the login month from the `last_login` and group students by month.**
+| Column Name   | Description                               |
+| ------------- | ----------------------------------------- |
+| id            | Auto-incremented primary key              |
+| name          | Name of the student                       |
+| age           | Age of the student                        |
+| score         | Numeric score of the student              |
+| department_id | Foreign key referencing departments table |
 
-3. **Count how many students logged in per month and show only those months where login count is more than 3.**
+### 🔹 `departments` Table
 
----
+| Column Name | Description                             |
+| ----------- | --------------------------------------- |
+| id          | Auto-incremented primary key            |
+| name        | Name of the department (e.g., CSE, EEE) |
 
-### **Foreign Key & Constraints (Based on 9-3, 9-4, 9-5)**
+### 🔹 `course_enrollments` Table
 
-4. **Create a foreign key constraint on `department_id` in the students table referencing `departments(id)`.**
-
-5. **Try inserting a student with a `department_id` that doesn’t exist and observe the behavior.**
-
-6. **Delete a department and see how students are affected using `ON DELETE CASCADE` and `ON DELETE SET NULL`.**
-
----
-
-### **Join Operations (Based on 9-6 to 9-8)**
-
-7. **Join students and departments using `INNER JOIN` to display each student's department name.**
-
-8. **Use a `LEFT JOIN` to show all students, including those without a department.**
-
-9. **Use a `RIGHT JOIN` to show all departments, including those without students.**
-
-10. **Perform a `FULL JOIN` to get all records from both students and departments.**
-
-11. **Create a cross-product of all students and courses using `CROSS JOIN`.**
-
-12. **Use `NATURAL JOIN` between tables that have a shared column like `department_id`.**
+| Column Name  | Description                            |
+| ------------ | -------------------------------------- |
+| id           | Auto-incremented primary key           |
+| student_id   | Foreign key referencing students table |
+| course_title | Name of the enrolled course            |
+| enrolled_on  | Date of enrollment (`DATE`)            |
 
 ---
 
-## Conclusion
+```sql
+CREATE TABLE departments (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
 
-These tasks are designed to help you understand and practice SQL concepts that are fundamental for working with relational databases. Feel free to explore and modify the queries to suit your needs or practice more.
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    age INTEGER NOT NULL,
+    score NUMERIC(10,4) ,
+    department_id INTEGER NOT NULL REFERENCES departments(id)
+);
+
+
+CREATE TABLE course_enrollment (
+    id SERIAL PRIMARY KEY,
+    student_id INTEGER NOT NULL REFERENCES students(id),
+    course_title VARCHAR(100) NOT NULL,
+    enroll_on DATE NOT NULL
+);
+
+INSERT INTO departments (name)
+VALUES
+    ('CSE'),
+    ('EEE'),
+    ('BBA'),
+    ('ME'),
+    ('Civil');
+
+
+INSERT INTO students (name, age, score, department_id)
+VALUES
+('Alice', 20, 91.5, 1),
+    ('Bob', 21, 78.0, 2),
+    ('Charlie', 22, 84.3, 1),
+    ('David', 20, 65.7, 3),
+    ('Eve', 23, 88.9, 2),
+    ('Frank', 24, 92.4, 4),
+    ('Grace', 21, NULL, 5),
+    ('Rachel', 22, 85.2, 1),
+    ('Steve', 24, 60.0, 3),
+    ('Trudy', 20, NULL, 2),         -- score is NULL
+    ('Uma', 21, 92.7, 1),
+    ('Victor', 23, 48.5, 4),
+    ('Wendy', 25, 75.3, 5),
+    ('Xander', 26, 88.8, 3),
+    ('Yasmine', 22, 79.5, 2),
+    ('Zane', 24, NULL, 4),          -- score is NULL
+    ('Abigail', 20, 66.6, 5),
+    ('Heidi', 22, 79.2, 1),
+    ('Ivan', 20, 55.0, 3),
+    ('Judy', 25, 89.5, 2),
+    ('Kevin', 23, 95.0, 1),
+    ('Laura', 24, 70.0, 4),
+    ('Mallory', 21, 67.8, 5),
+    ('Nathan', 22, 82.6, 2),
+    ('Olivia', 20, NULL, 3),  -- Another NULL score
+    ('Peter', 26, 74.1, 4),
+    ('Quinn', 23, 90.3, 1);
+
+INSERT INTO course_enrollment (student_id, course_title, enroll_on)
+VALUES
+(1, 'Database Systems', '2024-01-15'),
+    (1, 'Operating Systems', '2024-02-10'),
+    (2, 'Circuit Analysis', '2024-03-12'),
+    (3, 'Algorithms', '2024-04-01'),
+    (4, 'Marketing Basics', '2024-02-20'),
+    (6, 'Thermodynamics', '2024-05-01'),
+    (7, 'Cybersecurity Fundamentals', '2023-11-15'),
+    (8, 'Data Analytics', '2024-01-20'),
+    (9, 'Digital Marketing', '2023-12-05'),
+    (10, 'Machine Learning', '2024-03-10'),
+    (11, 'Thermal Engineering', '2024-04-18'),
+    (12, 'Fluid Mechanics', '2023-10-08'),
+    (13, 'Econometrics', '2024-05-21'),
+    (14, 'Intro to AI', '2024-02-28'),
+    (15, 'Project Management', '2024-03-02'),
+    (16, 'Database Systems', '2024-04-25'),
+    (17, 'Software Engineering', CURRENT_DATE);
+
+drop Table course_enrollment;
+drop Table students;
+drop Table departments;
+```
+
+## 🔍 Query Practice & Subqueries (10-1 to 10-3)
+
+- **Retrieve all students who scored higher than the average score.**
+
+```sql
+SELECT* from students
+WHERE score > (SELECT avg(score) from students);
+```
+
+- **Find students whose age is greater than the average age of all students.**
+
+```sql
+SELECT * FROM students
+WHERE age > (SELECT avg(age) from students);
+```
+
+- **Get names of students who are enrolled in any course** (use `IN` with subquery).
+
+```sql
+SELECT * from students;
+SELECT * from students
+WHERE id IN (SELECT student_id FROM course_enrollment);
+```
+
+- **Retrieve departments with at least one student scoring above 90** (use `EXISTS`).
+
+```sql
+SELECT * FROM departments
+WHERE EXISTS (
+    SELECT 1
+    FROM students
+    WHERE students.department_id = departments.id
+    AND students.score > 90
+);
+
+SELECT* from students;
+SELECT* from departments;
+SELECT* from course_enrollment
+```
+
+---
+
+## 👁️ Views in PostgreSQL (10-4)
+
+- **Create a view to show each student’s name, department, and score.**
+
+```sql
+CREATE OR REPLACE VIEW joining_view AS
+SELECT
+    students.id AS student_id,
+    students.name AS student_name,
+    departments.name AS department_name,
+    students.score
+FROM students
+JOIN departments ON students.department_id = departments.id;
+
+
+SELECT * FROM joining_view;
+
+
+CREATE OR REPLACE VIEW student_view
+AS
+SELECT
+    student_name,
+    department_name,
+    score
+FROM joining_view;
+
+SELECT * FROM student_view;
+```
+
+- **Create a view that lists all students enrolled in any course with the enrollment date.**
+
+```sql
+CREATE or replace view enrollment_joining
+AS
+SELECT
+course_enrollment.id AS course_id,
+students.name AS student_name,
+course_enrollment.course_title,
+course_enrollment.enroll_on
+FROM course_enrollment
+JOIN students ON  course_enrollment.student_id = students.id;
+
+
+SELECT* FROM course_enrollment;
+SELECT* FROM students
+
+SELECT* FROM enrollment_joining
+```
+
+---
+
+## 🧩 Functions in PostgreSQL (10-5)
+
+- **Create a function that takes a student's score and returns a grade**  
+  _(e.g., A for 90+, B for 80–89, C for 70–79, F otherwise)_.
+
+```sql
+CREATE  or replace FUNCTION grab_grade(score numeric)
+RETURNS TEXT
+LANGUAGE plpgsql
+as
+$$
+
+BEGIN
+    IF score >= 90 THEN
+        RETURN 'A';
+    ELSIF score >= 80 THEN
+        RETURN 'B';
+    ELSIF score >= 70 THEN
+        RETURN 'C';
+    ELSE
+        RETURN 'F';
+    END IF;
+END
+
+$$
+
+SELECT name, score, grab_grade(score) FROM students;
+
+select * from students
+
+select * from departments
+
+```
+
+- **Create a function that returns the full name and department of a student by ID.**
+
+```sql
+SELECT students.name as student_name, departments.name as department_name
+FROM students
+JOIN departments ON departments.id = students.department_id;
+
+CREATE or replace FUNCTION dpt_fn()
+RETURNS  TABLE(student_name TEXT, department_name TEXT)
+LANGUAGE sql
+AS
+$$
+SELECT students.name as student_name, departments.name as department_name FROM students
+JOIN departments ON departments.id = students.department_id;
+$$
+
+SELECT * FROM dpt_fn();
+```
+
+---
+
+## ⚙️ Stored Procedures (10-6)
+
+- **Write a stored procedure to update a student's department.**
+
+- **Write a procedure to delete students who haven't enrolled in any course.**
+
+---
+
+## 🔁 Triggers in PostgreSQL (10-7)
+
+- **Create a trigger that automatically logs enrollment when a student is added to `course_enrollments`.**
+
+- **Add a trigger that sets the score to `0` if a new student record is added without a score.**
+
+---
+
+## 🚀 Indexing (10-8 & 10-9)
+
+- **Add an index to the `score` column in the `students` table.**
+
+- **Add a composite index on `student_id` and `enrolled_on` in the `course_enrollments` table.**
+
+- **Compare query performance with and without indexes using `EXPLAIN`.**
+
+---
